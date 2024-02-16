@@ -1,18 +1,15 @@
 @file: OptIn(UnstableApi::class) package com.lovegaoshi.kotlinAudio
 
-
-import androidx.annotation.OptIn
 import android.content.Intent
 import android.os.Bundle
+import androidx.annotation.OptIn
 import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaLibraryService
+import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
-import com.google.common.collect.ImmutableList
 import com.lovegaoshi.kotlinAudio.models.KACommandButton
-
 
 class MusicService : MediaLibraryService() {
     private var mediaSession: MediaLibrarySession? = null
@@ -23,9 +20,11 @@ class MusicService : MediaLibraryService() {
     // Create your player and media session in the onCreate lifecycle event
     override fun onCreate() {
         super.onCreate()
+        // Service is immediately set up for the KA example.
+        setupService()
     }
 
-    fun setupService(customActions: ImmutableList<KACommandButton>) {
+    fun setupService(customActions: List<KACommandButton> = arrayListOf()) {
         val player = ExoPlayer.Builder(this).build()
 
         val forwardingPlayer = object : ForwardingPlayer(player) {
@@ -43,7 +42,7 @@ class MusicService : MediaLibraryService() {
         mKAPlayer.setupPlayer(
             context = this,
             service = this,
-            player = forwardingPlayer,
+            fplayer = forwardingPlayer,
             callback = CustomMediaSessionCallback(customActions = customActions),
             layout = customActions.filter { v -> v.onLayout }.map{ v -> v.commandButton}
             )
@@ -71,7 +70,7 @@ class MusicService : MediaLibraryService() {
     }
 
     @UnstableApi private inner class CustomMediaSessionCallback(
-        val customActions: ImmutableList<KACommandButton>
+        val customActions: List<KACommandButton>
     ) : MediaLibrarySession.Callback {
         // Configure commands available to the controller in onConnect()
         override fun onConnect(
@@ -87,6 +86,4 @@ class MusicService : MediaLibraryService() {
                 .build()
         }
     }
-
-
 }
