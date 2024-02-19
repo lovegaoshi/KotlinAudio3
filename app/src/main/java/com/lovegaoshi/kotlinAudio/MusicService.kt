@@ -1,7 +1,9 @@
 @file: OptIn(UnstableApi::class) package com.lovegaoshi.kotlinAudio
 
 import android.content.Intent
+import android.os.Binder
 import android.os.Bundle
+import android.os.IBinder
 import androidx.annotation.OptIn
 import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.util.UnstableApi
@@ -13,6 +15,7 @@ import com.lovegaoshi.kotlinAudio.models.KACommandButton
 
 class MusicService : MediaLibraryService() {
     private var mediaSession: MediaLibrarySession? = null
+    private val binder = MusicBinder()
     lateinit var mKAPlayer: Player
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? =
@@ -84,6 +87,19 @@ class MusicService : MediaLibraryService() {
             return MediaSession.ConnectionResult.AcceptedResultBuilder(session)
                 .setAvailableSessionCommands(sessionCommands.build())
                 .build()
+        }
+    }
+
+    inner class MusicBinder : Binder() {
+        val service = this@MusicService
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        val intentAction = intent?.action
+        return if (intentAction != null) {
+            super.onBind(intent)
+        } else {
+            binder
         }
     }
 }
