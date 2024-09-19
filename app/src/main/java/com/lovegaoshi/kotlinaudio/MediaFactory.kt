@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
@@ -58,9 +59,9 @@ class MediaFactory (
         val resourceId = mediaItem.mediaMetadata.extras?.getInt("resource-id")
         val resourceType = mediaItem.mediaMetadata.extras?.getString("type")
         val uri = Uri.parse(mediaItem.mediaMetadata.extras?.getString("uri")!!)
-
+        Log.d("APM", "$resourceType: $resourceId")
         val factory: DataSource.Factory = when {
-            resourceId != null -> {
+            resourceId != 0 && resourceId != null -> {
                 val raw = RawResourceDataSource(context)
                 raw.open(DataSpec(uri))
                 DataSource.Factory { raw }

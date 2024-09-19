@@ -14,7 +14,7 @@ class Player {
 
         exoPlayer = ExoPlayer
             .Builder(context)
-            .setMediaSourceFactory(MediaFactory(context))
+            .setMediaSourceFactory(MediaFactory(context, cache = null))
             .build()
         player = object : ForwardingPlayer(exoPlayer) {
             override fun play() {

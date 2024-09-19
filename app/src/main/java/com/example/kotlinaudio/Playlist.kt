@@ -12,7 +12,6 @@ class Playlist {
             artworkUri = "https://rntp.dev/example/Longing.jpeg",
             options = AudioItemOptions(
                 userAgent = "myuseragent",
-                resourceId = 1,
                 headers = hashMapOf("some-header" to "some-result")
             )
         ).mediaItem,
@@ -25,7 +24,8 @@ class Playlist {
         AudioItem(
             uri = "https://rntp.dev/example/hls/whip/playlist.m3u8",
             title = "Whip",
-            artworkUri = "https://rntp.dev/example/hls/whip/whip.jpeg"
+            artworkUri = "https://rntp.dev/example/hls/whip/whip.jpeg",
+            options = AudioItemOptions(type="hls")
         ).mediaItem,
         AudioItem(
             uri = "https://ais-sa5.cdnstream1.com/b75154_128mp3",
