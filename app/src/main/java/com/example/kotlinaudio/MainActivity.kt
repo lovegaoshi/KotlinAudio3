@@ -1,4 +1,4 @@
-package com.lovegaoshi.kotlinAudio
+package com.example.kotlinaudio
 
 import android.content.ComponentName
 import android.content.Context
@@ -37,12 +37,12 @@ import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaBrowser
 import androidx.media3.session.SessionToken
-import com.example.kotlin_audio_example.ui.component.ActionBottomSheet
-import com.example.kotlin_audio_example.ui.component.PlayerControls
-import com.example.kotlin_audio_example.ui.component.TrackDisplay
-import com.example.kotlin_audio_example.ui.theme.KotlinAudioTheme
+import com.example.kotlinaudio.ui.component.ActionBottomSheet
+import com.example.kotlinaudio.ui.component.PlayerControls
+import com.example.kotlinaudio.ui.component.TrackDisplay
+import com.example.kotlinaudio.ui.theme.KotlinAudioTheme
 import com.google.common.util.concurrent.MoreExecutors
-import com.lovegaoshi.kotlinAudio.models.KAMediaItem
+import com.lovegaoshi.kotlinaudio.models.AudioItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -50,37 +50,37 @@ import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
-class MainActivity : ComponentActivity() {
+@UnstableApi class MainActivity : ComponentActivity() {
     private lateinit var browser: MediaBrowser
-    private lateinit var musicService: MusicService
+    private lateinit var musicService: com.lovegaoshi.kotlinaudio.service.MusicService
     private var mBound: Boolean = false
     private lateinit var player: ForwardingPlayer
     @androidx.annotation.OptIn(UnstableApi::class) @OptIn(ExperimentalMaterial3Api::class)
     override fun onStart() {
         super.onStart()
-        val intent = Intent(this, MusicService::class.java)
+        val intent = Intent(this, com.lovegaoshi.kotlinaudio.service.MusicService::class.java)
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
         val sessionToken =
-            SessionToken(this, ComponentName(this, MusicService::class.java))
+            SessionToken(this, ComponentName(this, com.lovegaoshi.kotlinaudio.service.MusicService::class.java))
         val mediaItems = listOf(
-            KAMediaItem(
+            AudioItem(
                 uri = "https://rntp.dev/example/Longing.mp3",
                 title = "Longing",
                 artist = "David Chavez",
                 artworkUri = "https://rntp.dev/example/Longing.jpeg"
             ).mediaItem,
-            KAMediaItem(
+            AudioItem(
                 uri = "https://rntp.dev/example/Soul%20Searching.mp3",
                 title = "LSoul Searching (Demo)",
                 artist = "David Chavez",
                 artworkUri = "https://rntp.dev/example/Soul%20Searching.jpeg"
             ).mediaItem,
-            KAMediaItem(
+            AudioItem(
                 uri = "https://rntp.dev/example/hls/whip/playlist.m3u8",
                 title = "Whip",
                 artworkUri = "https://rntp.dev/example/hls/whip/whip.jpeg"
             ).mediaItem,
-            KAMediaItem(
+            AudioItem(
                 uri = "https://ais-sa5.cdnstream1.com/b75154_128mp3",
                 title = "Smooth Jazz 24/7",
                 artist = "David Chavez",
@@ -180,7 +180,7 @@ class MainActivity : ComponentActivity() {
 
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             // when the service is connected, get its instance
-            val binder = service as MusicService.MusicBinder
+            val binder = service as com.lovegaoshi.kotlinaudio.service.MusicService.MusicBinder
             musicService = binder.service
             mBound = true
         }

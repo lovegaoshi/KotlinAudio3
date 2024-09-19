@@ -1,4 +1,4 @@
-package com.lovegaoshi.kotlinAudio.models
+package com.lovegaoshi.kotlinaudio.models
 
 import android.net.Uri
 import android.os.Bundle
@@ -6,7 +6,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import java.util.UUID
 
-class KAMediaItem(
+class AudioItem(
     uri: String,
     mediaId: String = UUID.randomUUID().toString(),
     extras: Bundle = Bundle.EMPTY,

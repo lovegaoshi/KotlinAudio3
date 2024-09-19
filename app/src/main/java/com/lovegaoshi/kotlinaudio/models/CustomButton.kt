@@ -1,10 +1,10 @@
-package com.lovegaoshi.kotlinAudio.models
+package com.lovegaoshi.kotlinaudio.models
 
 import android.os.Bundle
 import androidx.media3.session.CommandButton
 import androidx.media3.session.SessionCommand
 
-data class KACommandButton (
+data class CustomButton (
     val displayName: String = "",
     val iconRes: Int = 0,
     val sessionCommand: String = "",

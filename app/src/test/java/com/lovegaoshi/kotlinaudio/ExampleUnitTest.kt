@@ -1,4 +1,4 @@
-package com.lovegaoshi.kotlinAudio
+package com.lovegaoshi.kotlinaudio
 
 import org.junit.Test
 

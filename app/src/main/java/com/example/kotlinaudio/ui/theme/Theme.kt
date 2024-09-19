@@ -1,4 +1,4 @@
-package com.example.kotlin_audio_example.ui.theme
+package com.example.kotlinaudio.ui.theme
 
 import android.app.Activity
 import android.os.Build

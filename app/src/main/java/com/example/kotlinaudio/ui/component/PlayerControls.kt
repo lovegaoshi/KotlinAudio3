@@ -1,4 +1,4 @@
-package com.example.kotlin_audio_example.ui.component
+package com.example.kotlinaudio.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.kotlin_audio_example.ui.theme.KotlinAudioTheme
+import com.example.kotlinaudio.ui.theme.KotlinAudioTheme
 
 @Composable
 fun PlayerControls(

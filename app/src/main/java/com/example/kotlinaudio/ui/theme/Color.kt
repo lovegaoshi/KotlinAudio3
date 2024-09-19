@@ -1,4 +1,4 @@
-package com.example.kotlin_audio_example.ui.theme
+package com.example.kotlinaudio.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

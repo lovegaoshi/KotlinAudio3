@@ -1,4 +1,4 @@
-@file: OptIn(UnstableApi::class) package com.lovegaoshi.kotlinAudio
+@file: OptIn(UnstableApi::class) package com.lovegaoshi.kotlinaudio.service
 
 import android.content.Intent
 import android.os.Binder
@@ -11,15 +11,17 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
-import com.lovegaoshi.kotlinAudio.models.KACommandButton
+import com.lovegaoshi.kotlinaudio.Player
+import com.lovegaoshi.kotlinaudio.models.CustomButton
 
 class MusicService : MediaLibraryService() {
-    private var mediaSession: MediaLibrarySession? = null
     private val binder = MusicBinder()
-    lateinit var mKAPlayer: Player
+    lateinit var mKAPlayer: com.lovegaoshi.kotlinaudio.Player
+    lateinit var mediaSession: MediaLibrarySession
 
-    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? =
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession =
         mediaSession
+
     // Create your player and media session in the onCreate lifecycle event
     override fun onCreate() {
         super.onCreate()
@@ -27,7 +29,7 @@ class MusicService : MediaLibraryService() {
         setupService()
     }
 
-    fun setupService(customActions: List<KACommandButton> = arrayListOf()) {
+    fun setupService(customActions: List<CustomButton> = arrayListOf()) {
         val player = ExoPlayer.Builder(this).build()
 
         val forwardingPlayer = object : ForwardingPlayer(player) {
@@ -42,19 +44,15 @@ class MusicService : MediaLibraryService() {
             }
         }
         mKAPlayer = Player()
-        mKAPlayer.setupPlayer(
-            context = this,
-            service = this,
-            fplayer = forwardingPlayer,
-            callback = CustomMediaSessionCallback(customActions = customActions),
-            layout = customActions.filter { v -> v.onLayout }.map{ v -> v.commandButton}
-            )
-        mediaSession = mKAPlayer.mediaSession
+        mKAPlayer.setupPlayer()
+        mediaSession = MediaLibrarySession.Builder(this, mKAPlayer.player, object : MediaLibrarySession.Callback {})
+            .setCustomLayout(customActions.filter { v -> v.onLayout }.map{ v -> v.commandButton})
+            .build()
     }
 
     // The user dismissed the app from the recent tasks
     override fun onTaskRemoved(rootIntent: Intent?) {
-        val player = mediaSession?.player!!
+        val player = mediaSession.player
         if (!player.playWhenReady || player.mediaItemCount == 0) {
             // Stop the service if not playing, continue playing in the background
             // otherwise.
@@ -64,16 +62,16 @@ class MusicService : MediaLibraryService() {
 
     // Remember to release the player and media session in onDestroy
     override fun onDestroy() {
-        mediaSession?.run {
+        mediaSession.run {
             player.release()
             release()
-            mediaSession = null
+            mediaSession.release()
         }
         super.onDestroy()
     }
 
     @UnstableApi private inner class CustomMediaSessionCallback(
-        val customActions: List<KACommandButton>
+        val customActions: List<CustomButton>
     ) : MediaLibrarySession.Callback {
         // Configure commands available to the controller in onConnect()
         override fun onConnect(

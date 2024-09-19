@@ -1,4 +1,4 @@
-package com.example.kotlin_audio_example.ui.component
+package com.example.kotlinaudio.ui.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding

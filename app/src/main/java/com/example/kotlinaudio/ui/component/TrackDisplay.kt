@@ -1,6 +1,5 @@
-package com.example.kotlin_audio_example.ui.component
+package com.example.kotlinaudio.ui.component
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.kotlin_audio_example.ui.theme.KotlinAudioTheme
+import com.example.kotlinaudio.ui.theme.KotlinAudioTheme
 
 @Composable
 fun TrackDisplay(
