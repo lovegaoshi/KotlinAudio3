@@ -5,9 +5,7 @@ import android.os.Binder
 import android.os.Bundle
 import android.os.IBinder
 import androidx.annotation.OptIn
-import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
@@ -16,7 +14,7 @@ import com.lovegaoshi.kotlinaudio.models.CustomButton
 
 class MusicService : MediaLibraryService() {
     private val binder = MusicBinder()
-    lateinit var mKAPlayer: com.lovegaoshi.kotlinaudio.Player
+    lateinit var player: Player
     lateinit var mediaSession: MediaLibrarySession
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession =
@@ -29,23 +27,12 @@ class MusicService : MediaLibraryService() {
         setupService()
     }
 
-    fun setupService(customActions: List<CustomButton> = arrayListOf()) {
-        val player = ExoPlayer.Builder(this).build()
+    private fun setupService(customActions: List<CustomButton> = arrayListOf()) {
 
-        val forwardingPlayer = object : ForwardingPlayer(player) {
-            override fun play() {
-                // Add custom logic
-                super.play()
-            }
-
-            override fun setPlayWhenReady(playWhenReady: Boolean) {
-                // Add custom logic
-                super.setPlayWhenReady(playWhenReady)
-            }
-        }
-        mKAPlayer = Player()
-        mKAPlayer.setupPlayer()
-        mediaSession = MediaLibrarySession.Builder(this, mKAPlayer.player, object : MediaLibrarySession.Callback {})
+        player = Player()
+        player.setupPlayer(this)
+        mediaSession = MediaLibrarySession
+            .Builder(this, player.player, CustomMediaSessionCallback(customActions))
             .setCustomLayout(customActions.filter { v -> v.onLayout }.map{ v -> v.commandButton})
             .build()
     }

@@ -42,7 +42,6 @@ import com.example.kotlinaudio.ui.component.PlayerControls
 import com.example.kotlinaudio.ui.component.TrackDisplay
 import com.example.kotlinaudio.ui.theme.KotlinAudioTheme
 import com.google.common.util.concurrent.MoreExecutors
-import com.lovegaoshi.kotlinaudio.models.AudioItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -62,31 +61,7 @@ import kotlin.time.Duration.Companion.seconds
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
         val sessionToken =
             SessionToken(this, ComponentName(this, com.lovegaoshi.kotlinaudio.service.MusicService::class.java))
-        val mediaItems = listOf(
-            AudioItem(
-                uri = "https://rntp.dev/example/Longing.mp3",
-                title = "Longing",
-                artist = "David Chavez",
-                artworkUri = "https://rntp.dev/example/Longing.jpeg"
-            ).mediaItem,
-            AudioItem(
-                uri = "https://rntp.dev/example/Soul%20Searching.mp3",
-                title = "LSoul Searching (Demo)",
-                artist = "David Chavez",
-                artworkUri = "https://rntp.dev/example/Soul%20Searching.jpeg"
-            ).mediaItem,
-            AudioItem(
-                uri = "https://rntp.dev/example/hls/whip/playlist.m3u8",
-                title = "Whip",
-                artworkUri = "https://rntp.dev/example/hls/whip/whip.jpeg"
-            ).mediaItem,
-            AudioItem(
-                uri = "https://ais-sa5.cdnstream1.com/b75154_128mp3",
-                title = "Smooth Jazz 24/7",
-                artist = "David Chavez",
-                artworkUri = "https://rntp.dev/example/smooth-jazz-24-7.jpeg"
-            ).mediaItem,
-        )
+        val mediaItems = Playlist().playlist
         val browserFuture = MediaBrowser.Builder(this, sessionToken).buildAsync()
         browserFuture.addListener({
             // MediaController is available here with controllerFuture.get()
@@ -98,7 +73,7 @@ import kotlin.time.Duration.Companion.seconds
         val scope = CoroutineScope(Dispatchers.Main)
         scope.launch {
             browser = browserFuture.await()
-            player = musicService.mKAPlayer.player
+            player = musicService.player.player
 
             setContent {
                 var title by remember { mutableStateOf("") }
