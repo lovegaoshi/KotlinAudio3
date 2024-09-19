@@ -2,6 +2,8 @@
 
 import android.content.Context
 import androidx.annotation.OptIn
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
 import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.DatabaseProvider
@@ -10,6 +12,7 @@ import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.ExoPlayer
 import com.lovegaoshi.kotlinaudio.models.PlayerOptions
+import com.lovegaoshi.kotlinaudio.models.setContentType
 import java.io.File
 
 class Player {
@@ -31,6 +34,13 @@ class Player {
             .Builder(context)
             .setMediaSourceFactory(MediaFactory(context, cache))
             .build()
+
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(C.USAGE_MEDIA)
+            .setContentType(setContentType(options.audioContentType))
+            .build();
+        exoPlayer.setAudioAttributes(audioAttributes, options.handleAudioFocus);
+
         player = object : ForwardingPlayer(exoPlayer) {
             override fun play() {
                 // Add custom logic
