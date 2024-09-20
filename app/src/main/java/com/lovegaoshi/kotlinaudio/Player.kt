@@ -5,6 +5,7 @@ import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.ForwardingPlayer
+import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.DatabaseProvider
@@ -25,12 +26,19 @@ import com.lovegaoshi.kotlinaudio.models.setContentType
 import com.lovegaoshi.kotlinaudio.models.setWakeMode
 import java.io.File
 
-class Player {
+class Player (
+    private val context: Context,
+    val options: PlayerOptions = PlayerOptions()) {
     lateinit var exoPlayer: ExoPlayer
     lateinit var player: ForwardingPlayer
     private var cache: SimpleCache? = null
 
-    fun setupPlayer(context: Context, options: PlayerOptions = PlayerOptions()) {
+    val currentItem: MediaItem?
+        get() = exoPlayer.currentMediaItem
+
+    val playerState: Player.State? = null
+
+    fun setupPlayer() {
 
         if (options.cacheSize > 0) {
             val db: DatabaseProvider = StandaloneDatabaseProvider(context)
@@ -91,6 +99,8 @@ class Player {
         }
     }
 
+
+
 }
 
 private fun setupBuffer(bufferConfig: BufferOptions): DefaultLoadControl {
@@ -112,3 +122,4 @@ private fun setupBuffer(bufferConfig: BufferOptions): DefaultLoadControl {
             .build()
     }
 }
+

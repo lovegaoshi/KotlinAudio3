@@ -29,8 +29,8 @@ class MusicService : MediaLibraryService() {
 
     private fun setupService(customActions: List<CustomButton> = arrayListOf()) {
 
-        player = Player()
-        player.setupPlayer(this)
+        player = Player(this)
+        player.setupPlayer()
         mediaSession = MediaLibrarySession
             .Builder(this, player.player, CustomMediaSessionCallback(customActions))
             .setCustomLayout(customActions.filter { v -> v.onLayout }.map{ v -> v.commandButton})
