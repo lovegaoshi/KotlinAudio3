@@ -9,12 +9,12 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
-import com.lovegaoshi.kotlinaudio.Player
+import com.lovegaoshi.kotlinaudio.BasePlayer
 import com.lovegaoshi.kotlinaudio.models.CustomButton
 
 class MusicService : MediaLibraryService() {
     private val binder = MusicBinder()
-    lateinit var player: Player
+    lateinit var player: BasePlayer
     lateinit var mediaSession: MediaLibrarySession
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession =
@@ -29,7 +29,7 @@ class MusicService : MediaLibraryService() {
 
     private fun setupService(customActions: List<CustomButton> = arrayListOf()) {
 
-        player = Player(this)
+        player = BasePlayer(this)
         player.setupPlayer()
         mediaSession = MediaLibrarySession
             .Builder(this, player.player, CustomMediaSessionCallback(customActions))
