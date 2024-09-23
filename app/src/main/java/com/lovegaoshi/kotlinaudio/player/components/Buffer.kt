@@ -1,4 +1,4 @@
-package com.lovegaoshi.kotlinaudio.player
+package com.lovegaoshi.kotlinaudio.player.components
 
 import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi

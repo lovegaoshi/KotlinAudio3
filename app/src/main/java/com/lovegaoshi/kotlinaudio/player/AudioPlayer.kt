@@ -29,6 +29,10 @@ import com.lovegaoshi.kotlinaudio.models.PlayerOptions
 import com.lovegaoshi.kotlinaudio.models.PositionChangedReason
 import com.lovegaoshi.kotlinaudio.models.setContentType
 import com.lovegaoshi.kotlinaudio.models.setWakeMode
+import com.lovegaoshi.kotlinaudio.player.components.Cache
+import com.lovegaoshi.kotlinaudio.player.components.FocusManager
+import com.lovegaoshi.kotlinaudio.player.components.MediaFactory
+import com.lovegaoshi.kotlinaudio.player.components.setupBuffer
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
@@ -37,12 +41,12 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 abstract class AudioPlayer internal constructor(
-    internal val context: Context,
+    context: Context,
     val options: PlayerOptions = PlayerOptions()
 ) : AudioManager.OnAudioFocusChangeListener {
 
-    lateinit var exoPlayer: ExoPlayer
-    lateinit var player: ForwardingPlayer
+    var exoPlayer: ExoPlayer
+    var player: ForwardingPlayer
     private val scope = MainScope()
     private var cache: SimpleCache? = null
     private val playerEventHolder = PlayerEventHolder()
@@ -87,13 +91,13 @@ abstract class AudioPlayer internal constructor(
 
     val position: Long
         get() {
-            return if (exoPlayer.currentPosition == C.POSITION_UNSET.toLong()) 0
+            return if (exoPlayer.currentPosition == C.INDEX_UNSET.toLong()) 0
             else exoPlayer.currentPosition
         }
 
     val bufferedPosition: Long
         get() {
-            return if (exoPlayer.bufferedPosition == C.POSITION_UNSET.toLong()) 0
+            return if (exoPlayer.bufferedPosition == C.INDEX_UNSET.toLong()) 0
             else exoPlayer.bufferedPosition
         }
 
@@ -146,7 +150,7 @@ abstract class AudioPlayer internal constructor(
         exoPlayer = ExoPlayer
             .Builder(context)
             .setHandleAudioBecomingNoisy(options.handleAudioBecomingNoisy)
-            .setMediaSourceFactory(com.lovegaoshi.kotlinaudio.player.MediaFactory(context, cache))
+            .setMediaSourceFactory(MediaFactory(context, cache))
             .setWakeMode(setWakeMode(options.wakeMode))
             .apply {
                 setLoadControl(setupBuffer(options.bufferOptions))
@@ -346,6 +350,10 @@ abstract class AudioPlayer internal constructor(
                     )
                 )
                 Player.DISCONTINUITY_REASON_INTERNAL -> playerEventHolder.updatePositionChangedReason(
+                    PositionChangedReason.UNKNOWN(oldPosition.positionMs, newPosition.positionMs)
+                )
+
+                Player.DISCONTINUITY_REASON_SILENCE_SKIP -> playerEventHolder.updatePositionChangedReason(
                     PositionChangedReason.UNKNOWN(oldPosition.positionMs, newPosition.positionMs)
                 )
             }

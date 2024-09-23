@@ -1,4 +1,4 @@
-package com.lovegaoshi.kotlinaudio.player
+package com.lovegaoshi.kotlinaudio.player.components
 
 import android.content.Context
 import android.media.AudioManager

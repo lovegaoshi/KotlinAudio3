@@ -1,6 +1,5 @@
-package com.lovegaoshi.kotlinaudio.player
+package com.lovegaoshi.kotlinaudio.player.components
 
-import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.os.Build
@@ -26,6 +25,7 @@ import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
 import androidx.media3.extractor.DefaultExtractorsFactory
+import com.lovegaoshi.kotlinaudio.utils.isUriLocalFile
 
 
 @OptIn(UnstableApi::class)
@@ -66,7 +66,7 @@ class MediaFactory (
                 raw.open(DataSpec(uri))
                 DataSource.Factory { raw }
             }
-            com.lovegaoshi.kotlinaudio.player.isUriLocalFile(uri) -> {
+            isUriLocalFile(uri) -> {
                 DefaultDataSource.Factory(context)
             }
             else -> {
@@ -128,19 +128,4 @@ class MediaFactory (
             }
         }
     }
-}
-
-fun isUriLocalFile(uri: Uri?): Boolean {
-    if (uri == null) return false
-    val scheme = uri.scheme
-    val host = uri.host
-    if((scheme == "http" || scheme == "https") && (host == "localhost" || host == "127.0.0.1" || host == "[::1]"))
-    {
-        return false
-    }
-    return scheme == null
-            || scheme == ContentResolver.SCHEME_FILE
-            || scheme == ContentResolver.SCHEME_ANDROID_RESOURCE
-            || scheme == ContentResolver.SCHEME_CONTENT
-            || scheme == "res" || host == null
 }
