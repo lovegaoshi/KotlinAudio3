@@ -36,7 +36,7 @@ import kotlinx.coroutines.delay
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-class AudioPlayer internal constructor(
+abstract class AudioPlayer internal constructor(
     internal val context: Context,
     val options: PlayerOptions = PlayerOptions()
 ) : AudioManager.OnAudioFocusChangeListener {
