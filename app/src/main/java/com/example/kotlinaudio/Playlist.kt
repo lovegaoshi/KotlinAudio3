@@ -1,9 +1,9 @@
 package com.example.kotlinaudio
 
-import com.doublesymmetry.kotlinaudio.models.AudioItem2MediaItem
-import com.doublesymmetry.kotlinaudio.models.AudioItemOptions
-import com.doublesymmetry.kotlinaudio.models.DefaultAudioItem
-import com.doublesymmetry.kotlinaudio.models.MediaType
+import com.lovegaoshi.kotlinaudio.models.AudioItem2MediaItem
+import com.lovegaoshi.kotlinaudio.models.AudioItemOptions
+import com.lovegaoshi.kotlinaudio.models.DefaultAudioItem
+import com.lovegaoshi.kotlinaudio.models.MediaType
 
 class Playlist {
     val playlist = listOf(

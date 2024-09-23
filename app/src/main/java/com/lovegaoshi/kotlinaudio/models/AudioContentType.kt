@@ -1,4 +1,4 @@
-package com.doublesymmetry.kotlinaudio.models
+package com.lovegaoshi.kotlinaudio.models
 
 enum class AudioContentType {
     MUSIC,

@@ -1,4 +1,4 @@
-package com.doublesymmetry.kotlinaudio.models
+package com.lovegaoshi.kotlinaudio.models
 
 /**
  * Use these events to track when and why the positionMs of an [AudioItem] changes.

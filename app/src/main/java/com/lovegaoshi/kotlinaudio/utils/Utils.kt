@@ -1,4 +1,4 @@
-package com.doublesymmetry.kotlinaudio.utils
+package com.lovegaoshi.kotlinaudio.utils
 
 import android.annotation.SuppressLint
 import android.content.ContentResolver

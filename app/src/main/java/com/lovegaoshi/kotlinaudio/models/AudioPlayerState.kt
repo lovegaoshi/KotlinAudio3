@@ -1,4 +1,4 @@
-package com.doublesymmetry.kotlinaudio.models
+package com.lovegaoshi.kotlinaudio.models
 
 enum class AudioPlayerState {
     /** The current [AudioItem] is being loaded for playback. */

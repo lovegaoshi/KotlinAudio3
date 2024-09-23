@@ -1,7 +1,10 @@
-package com.doublesymmetry.kotlinaudio.event
+package com.lovegaoshi.kotlinaudio.event
 
-import com.doublesymmetry.kotlinaudio.models.*
+import androidx.annotation.OptIn
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Metadata
+import androidx.media3.common.util.UnstableApi
+import com.lovegaoshi.kotlinaudio.models.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -21,7 +24,7 @@ class PlayerEventHolder {
 
     private var _playWhenReadyChange = MutableSharedFlow<PlayWhenReadyChangeData>(1)
     /**
-     * Use these events to track when [com.doublesymmetry.kotlinaudio.players.BaseAudioPlayer.playWhenReady]
+     * Use these events to track when [com.lovegaoshi.kotlinaudio.players.BaseAudioPlayer.playWhenReady]
      * changes.
      */
     var playWhenReadyChange = _playWhenReadyChange.asSharedFlow()
@@ -54,7 +57,7 @@ class PlayerEventHolder {
      *
      * The sources can be: media buttons on headphones, Android Wear, Android Auto, Google Assistant, media notification, etc.
      *
-     * For this observable to send events, set [interceptPlayerActionsTriggeredExternally][com.doublesymmetry.kotlinaudio.models.PlayerConfig.interceptPlayerActionsTriggeredExternally] to true.
+     * For this observable to send events, set [interceptPlayerActionsTriggeredExternally][com.lovegaoshi.kotlinaudio.models.PlayerConfig.interceptPlayerActionsTriggeredExternally] to true.
     */
     var onPlayerActionTriggeredExternally = _onPlayerActionTriggeredExternally.asSharedFlow()
 
@@ -100,6 +103,7 @@ class PlayerEventHolder {
         }
     }
 
+    @OptIn(UnstableApi::class)
     internal fun updateOnTimedMetadata(metadata: Metadata) {
         coroutineScope.launch {
             _onTimedMetadata.emit(metadata)

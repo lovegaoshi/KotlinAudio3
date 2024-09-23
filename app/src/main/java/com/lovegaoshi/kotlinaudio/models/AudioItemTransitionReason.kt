@@ -1,4 +1,4 @@
-package com.doublesymmetry.kotlinaudio.models
+package com.lovegaoshi.kotlinaudio.models
 
 /**
  * Use these events to track when and why an [AudioItem] transitions to another.
@@ -14,8 +14,8 @@ sealed class AudioItemTransitionReason(val oldPosition: Long) {
 
     /**
      * A seek to another [AudioItem] has occurred. Usually triggered when calling
-     * [QueuedAudioPlayer.next][com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer.next]
-     * or [QueuedAudioPlayer.previous][com.doublesymmetry.kotlinaudio.players.QueuedAudioPlayer.previous].
+     * [QueuedAudioPlayer.next][com.lovegaoshi.kotlinaudio.players.QueuedAudioPlayer.next]
+     * or [QueuedAudioPlayer.previous][com.lovegaoshi.kotlinaudio.players.QueuedAudioPlayer.previous].
      */
     class SEEK_TO_ANOTHER_AUDIO_ITEM(oldPosition: Long) : AudioItemTransitionReason(oldPosition)
 
