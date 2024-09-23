@@ -12,6 +12,7 @@ data class PlayerOptions(
     val handleAudioBecomingNoisy: Boolean = false,
     val alwaysShowNext: Boolean = true,
     val handleAudioFocus: Boolean = true,
+    var alwaysPauseOnInterruption: Boolean = true,
     val bufferOptions: BufferOptions = BufferOptions(null, null, null, null)
 )
 
