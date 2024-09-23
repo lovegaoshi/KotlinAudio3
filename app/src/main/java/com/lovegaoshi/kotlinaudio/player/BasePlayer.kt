@@ -1,6 +1,8 @@
-@file: OptIn(UnstableApi::class) package com.lovegaoshi.kotlinaudio
+@file: OptIn(UnstableApi::class) package com.lovegaoshi.kotlinaudio.player
 
 import android.content.Context
+import android.media.AudioManager
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
@@ -13,12 +15,12 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.lovegaoshi.kotlinaudio.models.PlayerOptions
 import com.lovegaoshi.kotlinaudio.models.setContentType
 import com.lovegaoshi.kotlinaudio.models.setWakeMode
-import com.lovegaoshi.kotlinaudio.player.initCache
-import com.lovegaoshi.kotlinaudio.player.setupBuffer
 
-class BasePlayer (
-    private val context: Context,
-    val options: PlayerOptions = PlayerOptions()) {
+class BasePlayer internal constructor(
+    internal val context: Context,
+    val options: PlayerOptions = PlayerOptions()
+) : AudioManager.OnAudioFocusChangeListener {
+
     lateinit var exoPlayer: ExoPlayer
     lateinit var player: ForwardingPlayer
     private var cache: SimpleCache? = null
@@ -36,7 +38,7 @@ class BasePlayer (
         exoPlayer = ExoPlayer
             .Builder(context)
             .setHandleAudioBecomingNoisy(options.handleAudioBecomingNoisy)
-            .setMediaSourceFactory(MediaFactory(context, cache))
+            .setMediaSourceFactory(com.lovegaoshi.kotlinaudio.MediaFactory(context, cache))
             .setWakeMode(setWakeMode(options.wakeMode))
             .apply {
                 setLoadControl(setupBuffer(options.bufferOptions))
@@ -82,5 +84,9 @@ class BasePlayer (
                 super.setPlayWhenReady(playWhenReady)
             }
         }
+    }
+
+    override fun onAudioFocusChange(focusChange: Int) {
+        Log.d("APM","Audio focus changed")
     }
 }
