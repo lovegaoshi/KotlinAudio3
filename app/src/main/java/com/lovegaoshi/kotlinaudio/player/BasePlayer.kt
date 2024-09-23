@@ -18,7 +18,10 @@ import com.doublesymmetry.kotlinaudio.models.PlaybackError
 import com.lovegaoshi.kotlinaudio.models.PlayerOptions
 import com.lovegaoshi.kotlinaudio.models.setContentType
 import com.lovegaoshi.kotlinaudio.models.setWakeMode
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 
 class BasePlayer internal constructor(
     internal val context: Context,
@@ -52,10 +55,80 @@ class BasePlayer internal constructor(
             }
         }
 
-    fun setupPlayer() {
+    var playWhenReady: Boolean
+        get() = exoPlayer.playWhenReady
+        set(value) {
+            exoPlayer.playWhenReady = value
+        }
+
+    val duration: Long
+        get() {
+            return if (exoPlayer.duration == C.TIME_UNSET) 0
+            else exoPlayer.duration
+        }
+
+    val isCurrentMediaItemLive: Boolean
+        get() = exoPlayer.isCurrentMediaItemLive
+
+    private var oldPosition = 0L
+
+    val position: Long
+        get() {
+            return if (exoPlayer.currentPosition == C.POSITION_UNSET.toLong()) 0
+            else exoPlayer.currentPosition
+        }
+
+    val bufferedPosition: Long
+        get() {
+            return if (exoPlayer.bufferedPosition == C.POSITION_UNSET.toLong()) 0
+            else exoPlayer.bufferedPosition
+        }
+
+    private var volumeMultiplier = 1f
+        private set(value) {
+            field = value
+            volume = volume
+        }
+
+    var volume: Float
+        get() = exoPlayer.volume
+        set(value) {
+            exoPlayer.volume = value * volumeMultiplier
+        }
+
+    /**
+     * fade volume of the current exoPlayer by a simple linear function.
+     */
+    fun fadeVolume(volume: Float = 1f, duration: Long = 500, interval: Long = 20L, callback: () -> Unit = { }): Deferred<Unit> {
+        return scope.async {
+            val volumeDiff = (volume - exoPlayer.volume) * interval / duration
+            var fadeInDuration = duration
+            while (fadeInDuration > 0) {
+                fadeInDuration -= interval
+                exoPlayer.volume += volumeDiff
+                delay(interval)
+            }
+            exoPlayer.volume = volume
+            callback()
+            return@async
+        }
+    }
+
+    var playbackSpeed: Float
+        get() = exoPlayer.playbackParameters.speed
+        set(value) {
+            exoPlayer.setPlaybackSpeed(value)
+        }
+
+    val isPlaying
+        get() = exoPlayer.isPlaying
+
+    private var wasDucking = false
+
+    init {
 
         if (options.cacheSize > 0) {
-            cache = initCache(context, options.cacheSize)
+            cache = Cache.initCache(context, options.cacheSize)
         }
         exoPlayer = ExoPlayer
             .Builder(context)
@@ -74,7 +147,6 @@ class BasePlayer internal constructor(
         exoPlayer.setAudioAttributes(audioAttributes, options.handleAudioFocus);
 
         player = object : ForwardingPlayer(exoPlayer) {
-
 
             override fun isCommandAvailable(command: Int): Boolean {
                 if (options.alwaysShowNext) {

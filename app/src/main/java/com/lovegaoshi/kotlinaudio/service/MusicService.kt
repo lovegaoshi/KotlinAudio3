@@ -9,7 +9,6 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
-import com.lovegaoshi.kotlinaudio.player.BasePlayer
 import com.lovegaoshi.kotlinaudio.models.CustomButton
 
 class MusicService : MediaLibraryService() {
@@ -30,7 +29,6 @@ class MusicService : MediaLibraryService() {
     private fun setupService(customActions: List<CustomButton> = arrayListOf()) {
 
         player = com.lovegaoshi.kotlinaudio.player.BasePlayer(this)
-        player.setupPlayer()
         mediaSession = MediaLibrarySession
             .Builder(this, player.player, CustomMediaSessionCallback(customActions))
             .setCustomLayout(customActions.filter { v -> v.onLayout }.map{ v -> v.commandButton})

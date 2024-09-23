@@ -8,11 +8,20 @@ import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
 import java.io.File
 
-@UnstableApi fun initCache(context: Context, size: Long): SimpleCache {
-    val db: DatabaseProvider = StandaloneDatabaseProvider(context)
-    return SimpleCache(
-        File(context.cacheDir, "APM"),
-        LeastRecentlyUsedCacheEvictor(size),
-        db
-    )
+@UnstableApi
+object Cache {
+    @Volatile
+    private var instance: SimpleCache? = null
+
+    fun initCache(context: Context, size: Long): SimpleCache {
+        val db: DatabaseProvider = StandaloneDatabaseProvider(context)
+
+        instance ?: synchronized(this) {
+            instance ?: SimpleCache(
+                File(context.cacheDir, "APM"), LeastRecentlyUsedCacheEvictor(size), db)
+                .also { instance = it }
+        }
+
+        return instance!!
+    }
 }
