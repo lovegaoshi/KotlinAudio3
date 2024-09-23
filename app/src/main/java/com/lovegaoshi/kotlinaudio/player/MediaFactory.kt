@@ -1,4 +1,4 @@
-package com.lovegaoshi.kotlinaudio
+package com.lovegaoshi.kotlinaudio.player
 
 import android.content.ContentResolver
 import android.content.Context
@@ -66,7 +66,7 @@ class MediaFactory (
                 raw.open(DataSpec(uri))
                 DataSource.Factory { raw }
             }
-            isUriLocalFile(uri) -> {
+            com.lovegaoshi.kotlinaudio.player.isUriLocalFile(uri) -> {
                 DefaultDataSource.Factory(context)
             }
             else -> {

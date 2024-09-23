@@ -3,6 +3,7 @@
 import android.content.Context
 import android.media.AudioManager
 import android.util.Log
+import androidx.annotation.CallSuper
 import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
@@ -18,13 +19,14 @@ import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.ExoPlayer
 import com.lovegaoshi.kotlinaudio.event.PlayerEventHolder
 import com.lovegaoshi.kotlinaudio.models.AudioItem
+import com.lovegaoshi.kotlinaudio.models.AudioItem2MediaItem
 import com.lovegaoshi.kotlinaudio.models.AudioItemTransitionReason
 import com.lovegaoshi.kotlinaudio.models.AudioPlayerState
+import com.lovegaoshi.kotlinaudio.models.MediaItem2AudioItem
 import com.lovegaoshi.kotlinaudio.models.PlayWhenReadyChangeData
 import com.lovegaoshi.kotlinaudio.models.PlaybackError
-import com.lovegaoshi.kotlinaudio.models.PositionChangedReason
-import com.lovegaoshi.kotlinaudio.MediaFactory
 import com.lovegaoshi.kotlinaudio.models.PlayerOptions
+import com.lovegaoshi.kotlinaudio.models.PositionChangedReason
 import com.lovegaoshi.kotlinaudio.models.setContentType
 import com.lovegaoshi.kotlinaudio.models.setWakeMode
 import kotlinx.coroutines.Deferred
@@ -32,8 +34,9 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
-class BasePlayer internal constructor(
+class AudioPlayer internal constructor(
     internal val context: Context,
     val options: PlayerOptions = PlayerOptions()
 ) : AudioManager.OnAudioFocusChangeListener {
@@ -46,7 +49,7 @@ class BasePlayer internal constructor(
     private val focusManager = FocusManager(context, listener=this, options=options)
 
     open val currentItem: AudioItem?
-        get() = exoPlayer.currentMediaItem?.localConfiguration?.tag as AudioItem?
+        get() = MediaItem2AudioItem(exoPlayer.currentMediaItem)
 
     var playbackError: PlaybackError? = null
     var playerState: AudioPlayerState = AudioPlayerState.IDLE
@@ -143,7 +146,7 @@ class BasePlayer internal constructor(
         exoPlayer = ExoPlayer
             .Builder(context)
             .setHandleAudioBecomingNoisy(options.handleAudioBecomingNoisy)
-            .setMediaSourceFactory(MediaFactory(context, cache))
+            .setMediaSourceFactory(com.lovegaoshi.kotlinaudio.player.MediaFactory(context, cache))
             .setWakeMode(setWakeMode(options.wakeMode))
             .apply {
                 setLoadControl(setupBuffer(options.bufferOptions))
@@ -196,6 +199,102 @@ class BasePlayer internal constructor(
         Log.d("APM","Audio focus changed")
     }
 
+    /**
+     * Will replace the current item with a new one and load it into the player.
+     * @param item The [AudioItem] to replace the current one.
+     * @param playWhenReady Whether playback starts automatically.
+     */
+    open fun load(item: AudioItem, playWhenReady: Boolean = true) {
+        exoPlayer.playWhenReady = playWhenReady
+        load(item)
+    }
+
+    /**
+     * Will replace the current item with a new one and load it into the player.
+     * @param item The [AudioItem] to replace the current one.
+     */
+    open fun load(item: AudioItem) {
+        exoPlayer.addMediaItem(AudioItem2MediaItem(item))
+        exoPlayer.prepare()
+    }
+
+    fun togglePlaying() {
+        if (exoPlayer.isPlaying) {
+            pause()
+        } else {
+            play()
+        }
+    }
+
+    var skipSilence: Boolean
+        get() = exoPlayer.skipSilenceEnabled
+        set(value) {
+            exoPlayer.skipSilenceEnabled = value;
+        }
+
+    fun play() {
+        exoPlayer.play()
+        if (currentItem != null) {
+            exoPlayer.prepare()
+        }
+    }
+
+    fun prepare() {
+        if (currentItem != null) {
+            exoPlayer.prepare()
+        }
+    }
+
+    fun pause() {
+        exoPlayer.pause()
+    }
+
+    /**
+     * Stops playback, without clearing the active item. Calling this method will cause the playback
+     * state to transition to AudioPlayerState.IDLE and the player will release the loaded media and
+     * resources required for playback.
+     */
+    @CallSuper
+    open fun stop() {
+        playerState = AudioPlayerState.STOPPED
+        exoPlayer.playWhenReady = false
+        exoPlayer.stop()
+    }
+
+    @CallSuper
+    open fun clear() {
+        exoPlayer.clearMediaItems()
+    }
+
+    /**
+     * Pause playback whenever an item plays to its end.
+     */
+    fun setPauseAtEndOfItem(pause: Boolean) {
+        exoPlayer.pauseAtEndOfMediaItems = pause
+    }
+
+    /**
+     * Stops and destroys the player. Only call this when you are finished using the player, otherwise use [pause].
+     */
+    @CallSuper
+    open fun destroy() {
+        focusManager.abandonAudioFocusIfHeld()
+        stop()
+        exoPlayer.release()
+        cache?.release()
+        cache = null
+    }
+
+    open fun seek(duration: Long, unit: TimeUnit) {
+        val positionMs = TimeUnit.MILLISECONDS.convert(duration, unit)
+        exoPlayer.seekTo(positionMs)
+    }
+
+    open fun seekBy(offset: Long, unit: TimeUnit) {
+        val positionMs = exoPlayer.currentPosition + TimeUnit.MILLISECONDS.convert(offset, unit)
+        exoPlayer.seekTo(positionMs)
+    }
+
     inner class PlayerListener : Listener {
 
         /**
@@ -219,7 +318,7 @@ class BasePlayer internal constructor(
             newPosition: Player.PositionInfo,
             reason: Int
         ) {
-            this@BasePlayer.oldPosition = oldPosition.positionMs
+            this@AudioPlayer.oldPosition = oldPosition.positionMs
 
             when (reason) {
                 Player.DISCONTINUITY_REASON_AUTO_TRANSITION -> playerEventHolder.updatePositionChangedReason(

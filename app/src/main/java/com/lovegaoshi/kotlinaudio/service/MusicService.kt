@@ -13,7 +13,7 @@ import com.lovegaoshi.kotlinaudio.models.CustomButton
 
 class MusicService : MediaLibraryService() {
     private val binder = MusicBinder()
-    lateinit var player: com.lovegaoshi.kotlinaudio.player.BasePlayer
+    lateinit var player: com.lovegaoshi.kotlinaudio.player.AudioPlayer
     lateinit var mediaSession: MediaLibrarySession
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession =
@@ -28,7 +28,7 @@ class MusicService : MediaLibraryService() {
 
     private fun setupService(customActions: List<CustomButton> = arrayListOf()) {
 
-        player = com.lovegaoshi.kotlinaudio.player.BasePlayer(this)
+        player = com.lovegaoshi.kotlinaudio.player.AudioPlayer(this)
         mediaSession = MediaLibrarySession
             .Builder(this, player.player, CustomMediaSessionCallback(customActions))
             .setCustomLayout(customActions.filter { v -> v.onLayout }.map{ v -> v.commandButton})

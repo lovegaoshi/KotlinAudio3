@@ -97,3 +97,7 @@ fun AudioItem2MediaItem(audioItem: AudioItem): MediaItem {
         .setTag(audioItem)
         .build()
 }
+
+fun MediaItem2AudioItem(item: MediaItem?): AudioItem? {
+    return item?.localConfiguration?.tag as AudioItem?
+}
