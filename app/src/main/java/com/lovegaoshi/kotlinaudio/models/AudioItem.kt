@@ -94,6 +94,6 @@ fun AudioItem2MediaItem(audioItem: AudioItem): MediaItem {
                 })
                 .build()
         )
-        .setTag(audioItem.options)
+        .setTag(audioItem)
         .build()
 }
